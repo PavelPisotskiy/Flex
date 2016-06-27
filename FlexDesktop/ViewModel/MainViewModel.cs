@@ -1,65 +1,104 @@
-﻿using GalaSoft.MvvmLight;
-using FlexDesktop.Model;
+﻿using FlexDesktop.Messages;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Messaging;
+using MonoTorrent.BEncoding;
+using MonoTorrent.Client;
+using MonoTorrent.Client.Encryption;
+using MonoTorrent.Common;
+using System;
+using System.IO;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace FlexDesktop.ViewModel
 {
-    /// <summary>
-    /// This class contains properties that the main View can data bind to.
-    /// <para>
-    /// See http://www.mvvmlight.net
-    /// </para>
-    /// </summary>
     public class MainViewModel : ViewModelBase
     {
-        private readonly IDataService _dataService;
+        private DispatcherTimer dispatcherTimer;
 
-        /// <summary>
-        /// The <see cref="WelcomeTitle" /> property's name.
-        /// </summary>
-        public const string WelcomeTitlePropertyName = "WelcomeTitle";
+        ClientEngine engine;
 
-        private string _welcomeTitle = string.Empty;
-
-        /// <summary>
-        /// Gets the WelcomeTitle property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public string WelcomeTitle
+        public MainViewModel()
         {
-            get
-            {
-                return _welcomeTitle;
-            }
+            dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+            dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+
+
+            EngineSettings eSettings = new EngineSettings();
+           
+
+            engine = new ClientEngine(eSettings);
+
+           
+            
+
+        }
+
+        private void dispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            DownloadSpeed = Math.Round(manager.Monitor.DownloadSpeed / 1024.0, 2);
+            Downloaded = manager.Monitor.DataBytesDownloaded;
+            Console.WriteLine(manager.State);
+            Console.WriteLine(manager.Progress);
+            Console.WriteLine(manager.Peers.Seeds);
+            Console.WriteLine(manager.Error);
+            Console.WriteLine(new string('-', 30));
+        }
+
+        private double downloadSpeed;
+
+        public double DownloadSpeed
+        {
+            get { return downloadSpeed; }
             set
             {
-                Set(ref _welcomeTitle, value);
+                downloadSpeed = value;
+                RaisePropertyChanged(() => DownloadSpeed);
             }
         }
 
-        /// <summary>
-        /// Initializes a new instance of the MainViewModel class.
-        /// </summary>
-        public MainViewModel(IDataService dataService)
-        {
-            _dataService = dataService;
-            _dataService.GetData(
-                (item, error) =>
-                {
-                    if (error != null)
-                    {
-                        // Report error here
-                        return;
-                    }
+        private long downloaded;
 
-                    WelcomeTitle = item.Title;
-                });
+        public long Downloaded
+        {
+            get { return downloaded; }
+            set
+            {
+                downloaded = value;
+                RaisePropertyChanged(() => Downloaded);
+            }
         }
 
-        ////public override void Cleanup()
-        ////{
-        ////    // Clean up if needed
 
-        ////    base.Cleanup();
-        ////}
+
+        TorrentManager manager;
+
+        public void AddTorrent(string pathToTorrentFile)
+        {
+            Messenger.Default.Send(new AddTorrentShowDialog((dialogResult) =>
+            {
+                if (dialogResult == true)
+                {
+                    ViewModelLocator locator = new ViewModelLocator();
+                    var addTorrentViewModel = locator.AddTorrent;
+
+                    TorrentSettings tSettings = new TorrentSettings(5, 100);
+                    tSettings.UseDht = true;
+
+                    manager = new TorrentManager(addTorrentViewModel.Torrent, addTorrentViewModel.PathToFolder, tSettings);
+
+                    
+                    engine.Register(manager);
+                    
+                    manager.Start();
+                    engine.Listener.Start();
+
+
+                    dispatcherTimer.Start();
+                }
+            }, pathToTorrentFile));
+        }
+
     }
 }
