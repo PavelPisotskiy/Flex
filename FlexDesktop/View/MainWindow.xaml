@@ -14,6 +14,7 @@
     <Window.Resources>
         <ResourceDictionary>
             <converters:BiteConverter x:Key="bitConverter"></converters:BiteConverter>
+            <converters:SpeedConverter x:Key="speedConverter"></converters:SpeedConverter>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Skins/MainSkin.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -32,15 +33,42 @@
             </Border>
         </Border>
 
-        <Grid Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="Auto"></RowDefinition>
-            </Grid.RowDefinitions>
+        <ListBox Grid.Row="1" 
+                 Margin="5" 
+                 ItemsSource="{Binding Torrents}" 
+                 Name="lst" 
+                 ScrollViewer.CanContentScroll="False" 
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 HorizontalContentAlignment="Stretch">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.9*"></ColumnDefinition>
+                            <ColumnDefinition Width="0.1*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Row="0" Text="{Binding DownloadSpeed}"></TextBlock>
-            <TextBlock Grid.Row="1" Text="{Binding Downloaded, Converter={StaticResource bitConverter}}"></TextBlock>
-        </Grid>
+                        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding Torrent.Name, Mode=OneWay}" Margin="0,5"></TextBlock>
 
+                        <ProgressBar Grid.Row="1" Grid.Column="0" Value="{Binding Progress, Mode=OneWay}" Foreground="#FF0272B2"></ProgressBar>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Progress, Mode=OneWay, StringFormat={}{0:0.##}%}" Margin="10,0,0,0"></TextBlock>
+                        
+                        <Grid Grid.Row="2" Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding Monitor.DownloadSpeed, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource speedConverter}}"></TextBlock>
+                            <TextBlock Grid.Column="1" Text="{Binding State, Mode=OneWay}"></TextBlock>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </Grid>
 </Window>

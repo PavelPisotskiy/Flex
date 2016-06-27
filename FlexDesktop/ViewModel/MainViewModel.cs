@@ -6,6 +6,7 @@ using MonoTorrent.Client;
 using MonoTorrent.Client.Encryption;
 using MonoTorrent.Common;
 using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
@@ -14,65 +15,21 @@ namespace FlexDesktop.ViewModel
 {
     public class MainViewModel : ViewModelBase
     {
-        private DispatcherTimer dispatcherTimer;
-
         ClientEngine engine;
 
         public MainViewModel()
         {
-            dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-            dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
-
-
             EngineSettings eSettings = new EngineSettings();
-           
-
             engine = new ClientEngine(eSettings);
 
-           
-            
+            Torrents = new ObservableCollection<TorrentManager>();
 
         }
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            DownloadSpeed = Math.Round(manager.Monitor.DownloadSpeed / 1024.0, 2);
-            Downloaded = manager.Monitor.DataBytesDownloaded;
-            Console.WriteLine(manager.State);
-            Console.WriteLine(manager.Progress);
-            Console.WriteLine(manager.Peers.Seeds);
-            Console.WriteLine(manager.Error);
-            Console.WriteLine(new string('-', 30));
+            RaisePropertyChanged("Torrents");
         }
-
-        private double downloadSpeed;
-
-        public double DownloadSpeed
-        {
-            get { return downloadSpeed; }
-            set
-            {
-                downloadSpeed = value;
-                RaisePropertyChanged(() => DownloadSpeed);
-            }
-        }
-
-        private long downloaded;
-
-        public long Downloaded
-        {
-            get { return downloaded; }
-            set
-            {
-                downloaded = value;
-                RaisePropertyChanged(() => Downloaded);
-            }
-        }
-
-
-
-        TorrentManager manager;
 
         public void AddTorrent(string pathToTorrentFile)
         {
@@ -85,20 +42,26 @@ namespace FlexDesktop.ViewModel
 
                     TorrentSettings tSettings = new TorrentSettings(5, 100);
                     tSettings.UseDht = true;
-
-                    manager = new TorrentManager(addTorrentViewModel.Torrent, addTorrentViewModel.PathToFolder, tSettings);
-
                     
-                    engine.Register(manager);
-                    
-                    manager.Start();
-                    engine.Listener.Start();
+                    TorrentManager manager = new TorrentManager(addTorrentViewModel.Torrent, addTorrentViewModel.PathToFolder, tSettings);
+                    if(!engine.Contains(manager.InfoHash))
+                    {
+                        engine.Register(manager);
 
+                        manager.Start();
+                        engine.Listener.Start();
 
-                    dispatcherTimer.Start();
+                        Torrents.Add(manager);
+                    }
                 }
             }, pathToTorrentFile));
         }
 
+
+        public ObservableCollection<TorrentManager> Torrents
+        {
+            get;
+            private set;
+        }
     }
 }

@@ -86,6 +86,7 @@
     </ApplicationDefinition>
     <Compile Include="Converters\BiteConverter.cs" />
     <Compile Include="Converters\DownloadConverter.cs" />
+    <Compile Include="Converters\SpeedConverter.cs" />
     <Compile Include="Helpers\SingleInstanceApplicationWrapper.cs" />
     <Compile Include="Messages\AddTorrentShowDialog.cs" />
     <Compile Include="Messages\FolderBrowserShowDialogMessage.cs" />

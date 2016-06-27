@@ -10,70 +10,75 @@ using MonoTorrent.Common;
 
 namespace MonoTorrent.Client.Tracker
 {
-   public class UdpTracker : Tracker
-   {
-       private static readonly ILogger Logger = LogManager.GetLogger();
+    public class UdpTracker : Tracker
+    {
+        private static readonly ILogger Logger = LogManager.GetLogger();
 
-       private long connectionId;
-       private UdpClient tracker;
-       private IPEndPoint endpoint;
-       bool hasConnected;
-       bool amConnecting;
-       internal TimeSpan RetryDelay;
-       int timeout;
+        private long connectionId;
+        private UdpClient tracker;
+        private IPEndPoint endpoint;
+        bool hasConnected;
+        bool amConnecting;
+        internal TimeSpan RetryDelay;
+        int timeout;
 
-       public UdpTracker(Uri announceUrl)
-           : base(announceUrl)
-       {
-           CanScrape = true;
-           CanAnnounce = true;
-           RetryDelay = TimeSpan.FromSeconds(10);
-           tracker = new UdpClient(announceUrl.Host, announceUrl.Port);
-           endpoint = (IPEndPoint)tracker.Client.RemoteEndPoint;
-       }
+        public UdpTracker(Uri announceUrl)
+            : base(announceUrl)
+        {
+            CanScrape = true;
+            CanAnnounce = true;
+            RetryDelay = TimeSpan.FromSeconds(10);
+            if (announceUrl.Port == -1)
+            {
+                tracker = new UdpClient(announceUrl.Host, 53273);
+            }else
+                tracker = new UdpClient(announceUrl.Host, announceUrl.Port);
 
-       #region announce
+            endpoint = (IPEndPoint)tracker.Client.RemoteEndPoint;
+        }
 
-       public override void Announce(AnnounceParameters parameters, object state)
-       {
-           //LastUpdated = DateTime.Now;
-           if (!hasConnected && amConnecting)
-               return;
+        #region announce
 
-           if (!hasConnected)
-           {
-               amConnecting = true;
-               try
-               {
-                   Connect(new ConnectAnnounceState(parameters, ConnectAnnounceCallback, state));
-               }
-               catch (SocketException)
-               {
-                   DoAnnounceComplete(false, state, new List<Peer>());
-                   return;
-               }               
-           }
-           else
-               DoAnnounce(parameters, state);
-       }
+        public override void Announce(AnnounceParameters parameters, object state)
+        {
+            //LastUpdated = DateTime.Now;
+            if (!hasConnected && amConnecting)
+                return;
 
-       private void DoAnnounce(AnnounceParameters parameters, object state)
-       {
-           ConnectAnnounceState announceState = new ConnectAnnounceState(parameters, AnnounceCallback, state);
-           announceState.Message = new AnnounceMessage(DateTime.Now.GetHashCode(), connectionId, parameters);
-           try
-           {
-               SendAndReceive(announceState);
-           }
-           catch (SocketException)
-           {
-               DoAnnounceComplete(false, state, new List<Peer>());
-           }
-       }
+            if (!hasConnected)
+            {
+                amConnecting = true;
+                try
+                {
+                    Connect(new ConnectAnnounceState(parameters, ConnectAnnounceCallback, state));
+                }
+                catch (SocketException)
+                {
+                    DoAnnounceComplete(false, state, new List<Peer>());
+                    return;
+                }
+            }
+            else
+                DoAnnounce(parameters, state);
+        }
 
-       private void ConnectAnnounceCallback(IAsyncResult ar)
-       {
-           ConnectAnnounceState announceState = (ConnectAnnounceState)ar;
+        private void DoAnnounce(AnnounceParameters parameters, object state)
+        {
+            ConnectAnnounceState announceState = new ConnectAnnounceState(parameters, AnnounceCallback, state);
+            announceState.Message = new AnnounceMessage(DateTime.Now.GetHashCode(), connectionId, parameters);
+            try
+            {
+                SendAndReceive(announceState);
+            }
+            catch (SocketException)
+            {
+                DoAnnounceComplete(false, state, new List<Peer>());
+            }
+        }
+
+        private void ConnectAnnounceCallback(IAsyncResult ar)
+        {
+            ConnectAnnounceState announceState = (ConnectAnnounceState)ar;
             try
             {
                 if (announceState.SavedException != null)
@@ -94,11 +99,11 @@ namespace MonoTorrent.Client.Tracker
             {
                 DoAnnounceComplete(false, announceState.AsyncState, null);
             }
-       }
+        }
 
-       private void AnnounceCallback(IAsyncResult ar)
-       {
-           ConnectAnnounceState announceState = (ConnectAnnounceState)ar;
+        private void AnnounceCallback(IAsyncResult ar)
+        {
+            ConnectAnnounceState announceState = (ConnectAnnounceState)ar;
             try
             {
                 if (announceState.SavedException != null)
@@ -121,42 +126,42 @@ namespace MonoTorrent.Client.Tracker
             {
                 DoAnnounceComplete(false, announceState.AsyncState, null);
             }
-       }
+        }
 
-       private void CompleteAnnounce(UdpTrackerMessage message, object state)
-       {
-           ErrorMessage error = message as ErrorMessage;
-           if (error != null)
-           {
-               FailureMessage = error.Error;
-               DoAnnounceComplete(false, state, new List<Peer>());
-           }
-           else
-           {
-               AnnounceResponseMessage response = (AnnounceResponseMessage)message;
-               DoAnnounceComplete(true, state, response.Peers);
-               
-               //TODO seeders and leechers is not used in event.
-           }
-       }
+        private void CompleteAnnounce(UdpTrackerMessage message, object state)
+        {
+            ErrorMessage error = message as ErrorMessage;
+            if (error != null)
+            {
+                FailureMessage = error.Error;
+                DoAnnounceComplete(false, state, new List<Peer>());
+            }
+            else
+            {
+                AnnounceResponseMessage response = (AnnounceResponseMessage)message;
+                DoAnnounceComplete(true, state, response.Peers);
 
-       private void DoAnnounceComplete(bool successful, object state, List<Peer> peers)
-       {
-           RaiseAnnounceComplete(new AnnounceResponseEventArgs(this, state, successful, peers));
-       }
+                //TODO seeders and leechers is not used in event.
+            }
+        }
 
-       #endregion
+        private void DoAnnounceComplete(bool successful, object state, List<Peer> peers)
+        {
+            RaiseAnnounceComplete(new AnnounceResponseEventArgs(this, state, successful, peers));
+        }
 
-       #region connect
+        #endregion
 
-       private void Connect(UdpTrackerAsyncState connectState)
-       {
-           connectState.Message = new ConnectMessage();
-           tracker.Connect(Uri.Host, Uri.Port);
-           SendAndReceive(connectState);
-       }
+        #region connect
 
-       private bool ConnectCallback(IAsyncResult ar)
+        private void Connect(UdpTrackerAsyncState connectState)
+        {
+            connectState.Message = new ConnectMessage();
+            tracker.Connect(Uri.Host, Uri.Port);
+            SendAndReceive(connectState);
+        }
+
+        private bool ConnectCallback(IAsyncResult ar)
         {
             UdpTrackerAsyncState trackerState = (UdpTrackerAsyncState)ar;
             try
@@ -180,36 +185,36 @@ namespace MonoTorrent.Client.Tracker
             {
                 return false;
             }
-       }
-       #endregion
+        }
+        #endregion
 
-       #region scrape
+        #region scrape
 
-       public override void Scrape(ScrapeParameters parameters, object state)
-       {
-           //LastUpdated = DateTime.Now;
-           if (!hasConnected && amConnecting)
-               return;
+        public override void Scrape(ScrapeParameters parameters, object state)
+        {
+            //LastUpdated = DateTime.Now;
+            if (!hasConnected && amConnecting)
+                return;
 
-           if (!hasConnected)
-           {
-               amConnecting = true;
-               try
-               {
-                   Connect(new ConnectScrapeState(parameters, ConnectScrapeCallback, state));
-               }
-               catch (SocketException)
-               {
-                   DoScrapeComplete(false, state);
-                   return;
-               }
-           }
-           else
-               DoScrape(parameters, state);
-       }
-       private void ConnectScrapeCallback(IAsyncResult ar)
-       {
-           ConnectScrapeState scrapeState = (ConnectScrapeState)ar;
+            if (!hasConnected)
+            {
+                amConnecting = true;
+                try
+                {
+                    Connect(new ConnectScrapeState(parameters, ConnectScrapeCallback, state));
+                }
+                catch (SocketException)
+                {
+                    DoScrapeComplete(false, state);
+                    return;
+                }
+            }
+            else
+                DoScrape(parameters, state);
+        }
+        private void ConnectScrapeCallback(IAsyncResult ar)
+        {
+            ConnectScrapeState scrapeState = (ConnectScrapeState)ar;
             try
             {
                 if (scrapeState.SavedException != null)
@@ -230,25 +235,25 @@ namespace MonoTorrent.Client.Tracker
             {
                 DoScrapeComplete(false, scrapeState.AsyncState);
             }
-       }
-       private void DoScrape(ScrapeParameters parameters, object state)
-       {
-           //strange because here only one infohash???
-           //or get all torrent infohash so loop on torrents of client engine
-           List<byte[]> infohashs= new List<byte[]>(1);
-           infohashs.Add(parameters.InfoHash.Hash);
-           ConnectScrapeState scrapeState = new ConnectScrapeState(parameters, ScrapeCallback, state);
-           scrapeState.Message = new ScrapeMessage(DateTime.Now.GetHashCode(), connectionId, infohashs);
-           try
-           {
-               SendAndReceive(scrapeState);
-           }
-           catch (SocketException)
-           {
-               DoScrapeComplete(false, state);
-           }
-       }
-       private void ScrapeCallback(IAsyncResult ar)
+        }
+        private void DoScrape(ScrapeParameters parameters, object state)
+        {
+            //strange because here only one infohash???
+            //or get all torrent infohash so loop on torrents of client engine
+            List<byte[]> infohashs = new List<byte[]>(1);
+            infohashs.Add(parameters.InfoHash.Hash);
+            ConnectScrapeState scrapeState = new ConnectScrapeState(parameters, ScrapeCallback, state);
+            scrapeState.Message = new ScrapeMessage(DateTime.Now.GetHashCode(), connectionId, infohashs);
+            try
+            {
+                SendAndReceive(scrapeState);
+            }
+            catch (SocketException)
+            {
+                DoScrapeComplete(false, state);
+            }
+        }
+        private void ScrapeCallback(IAsyncResult ar)
         {
             try
             {
@@ -271,152 +276,152 @@ namespace MonoTorrent.Client.Tracker
             {
                 // Nothing to do i think
             }
-       }
-              
-       private void CompleteScrape(UdpTrackerMessage message, object state)
-       {
-           ErrorMessage error = message as ErrorMessage;
-           if (error != null)
-           {
-               FailureMessage = error.Error;
-               DoScrapeComplete(false, state);
-           }
-           else
-           {
-               //response.Scrapes not used for moment
-               //ScrapeResponseMessage response = (ScrapeResponseMessage)message;
-               DoScrapeComplete(true, state);
-           }
-       }
+        }
 
-       private void DoScrapeComplete(bool successful, object state)
-       {
-           ScrapeResponseEventArgs e = new ScrapeResponseEventArgs(this, state, successful);
-           RaiseScrapeComplete(e);
-       }
-       #endregion
+        private void CompleteScrape(UdpTrackerMessage message, object state)
+        {
+            ErrorMessage error = message as ErrorMessage;
+            if (error != null)
+            {
+                FailureMessage = error.Error;
+                DoScrapeComplete(false, state);
+            }
+            else
+            {
+                //response.Scrapes not used for moment
+                //ScrapeResponseMessage response = (ScrapeResponseMessage)message;
+                DoScrapeComplete(true, state);
+            }
+        }
 
-       #region TimeOut System
+        private void DoScrapeComplete(bool successful, object state)
+        {
+            ScrapeResponseEventArgs e = new ScrapeResponseEventArgs(this, state, successful);
+            RaiseScrapeComplete(e);
+        }
+        #endregion
 
-       private void SendAndReceive(UdpTrackerAsyncState messageState)
-       {
-           timeout = 1;
-           SendRequest(messageState);
-           tracker.BeginReceive(EndReceiveMessage, messageState);
-       }
+        #region TimeOut System
 
-       private void EndReceiveMessage(IAsyncResult result)
-       {
-           UdpTrackerAsyncState trackerState = (UdpTrackerAsyncState)result.AsyncState;
-           try
-           {
-               IPEndPoint endpoint = null;
-               trackerState.Data = tracker.EndReceive(result, ref endpoint);
-               trackerState.Callback(trackerState);
-           }
-           catch (Exception ex)
-           {
-               trackerState.Complete(ex);
-           }
-       }
+        private void SendAndReceive(UdpTrackerAsyncState messageState)
+        {
+            timeout = 1;
+            SendRequest(messageState);
+            tracker.BeginReceive(EndReceiveMessage, messageState);
+        }
 
-       private void SendRequest(UdpTrackerAsyncState requestState)
-       {
-           Logger.Info("Sending request to udp tracker {0}", Uri);
+        private void EndReceiveMessage(IAsyncResult result)
+        {
+            UdpTrackerAsyncState trackerState = (UdpTrackerAsyncState)result.AsyncState;
+            try
+            {
+                IPEndPoint endpoint = null;
+                trackerState.Data = tracker.EndReceive(result, ref endpoint);
+                trackerState.Callback(trackerState);
+            }
+            catch (Exception ex)
+            {
+                trackerState.Complete(ex);
+            }
+        }
 
-           //TODO BeginSend
-           byte[] buffer = requestState.Message.Encode();
-           var sent = tracker.Send(buffer, buffer.Length);
+        private void SendRequest(UdpTrackerAsyncState requestState)
+        {
+            Logger.Info("Sending request to udp tracker {0}", Uri);
 
-           //response timeout: we try 2 times every 10 sec
-           ClientEngine.MainLoop.QueueTimeout(RetryDelay, delegate
-           {
-               if (timeout == 0)//we receive data
+            //TODO BeginSend
+            byte[] buffer = requestState.Message.Encode();
+            var sent = tracker.Send(buffer, buffer.Length);
+
+            //response timeout: we try 2 times every 10 sec
+            ClientEngine.MainLoop.QueueTimeout(RetryDelay, delegate
+            {
+                if (timeout == 0)//we receive data
                    return false;
 
-               if (timeout <= 2)
-               {
-                   timeout++;
-				   try
-				   {
-                       Logger.Warn("Repeating udp tracker request {0}", Uri);
-					   tracker.Send(buffer, buffer.Length);
-				   }
-				   catch (Exception ex)
-				   {
-					   timeout = 0;
-                       requestState.Complete(ex);
-					   return false;
-				   }
-               }
-               else
-               {
-                   timeout = 0;
-                   Logger.Error("Tracker did not respond to the connect requests {0}", Uri);
-                   requestState.Complete(new Exception("Tracker did not respond to the connect requests"));
-                   return false;
-               }
-               return true;
-           });
-       }
+                if (timeout <= 2)
+                {
+                    timeout++;
+                    try
+                    {
+                        Logger.Warn("Repeating udp tracker request {0}", Uri);
+                        tracker.Send(buffer, buffer.Length);
+                    }
+                    catch (Exception ex)
+                    {
+                        timeout = 0;
+                        requestState.Complete(ex);
+                        return false;
+                    }
+                }
+                else
+                {
+                    timeout = 0;
+                    Logger.Error("Tracker did not respond to the connect requests {0}", Uri);
+                    requestState.Complete(new Exception("Tracker did not respond to the connect requests"));
+                    return false;
+                }
+                return true;
+            });
+        }
 
-       private UdpTrackerMessage Receive(UdpTrackerAsyncState trackerState, byte[] receivedMessage)
-       {
-           timeout = 0;//we have receive so unactive the timeout
-           byte[] data = receivedMessage;
-           UdpTrackerMessage rsp = UdpTrackerMessage.DecodeMessage(data, 0, data.Length, MessageType.Response);
+        private UdpTrackerMessage Receive(UdpTrackerAsyncState trackerState, byte[] receivedMessage)
+        {
+            timeout = 0;//we have receive so unactive the timeout
+            byte[] data = receivedMessage;
+            UdpTrackerMessage rsp = UdpTrackerMessage.DecodeMessage(data, 0, data.Length, MessageType.Response);
 
-           if (trackerState.Message.TransactionId != rsp.TransactionId)
-           {
-               FailureMessage = "Invalid transaction Id in response from udp tracker!";
-               return null;//to raise event fail outside
-           }
-           return rsp;
-       }
+            if (trackerState.Message.TransactionId != rsp.TransactionId)
+            {
+                FailureMessage = "Invalid transaction Id in response from udp tracker!";
+                return null;//to raise event fail outside
+            }
+            return rsp;
+        }
 
-#endregion
+        #endregion
 
-       public override string ToString()
-       {
-           return "udptracker:"+connectionId;
-       }
+        public override string ToString()
+        {
+            return "udptracker:" + connectionId;
+        }
 
-       #region async state
+        #region async state
 
-       abstract class UdpTrackerAsyncState : AsyncResult
-       {
-           public byte[] Data;
-           public UdpTrackerMessage Message;
+        abstract class UdpTrackerAsyncState : AsyncResult
+        {
+            public byte[] Data;
+            public UdpTrackerMessage Message;
 
-           protected UdpTrackerAsyncState(AsyncCallback callback, object state)
-               : base(callback, state)
-           {
+            protected UdpTrackerAsyncState(AsyncCallback callback, object state)
+                : base(callback, state)
+            {
 
-           }
-       }
+            }
+        }
 
-       class ConnectAnnounceState : UdpTrackerAsyncState
-       {
-           public AnnounceParameters Parameters;
+        class ConnectAnnounceState : UdpTrackerAsyncState
+        {
+            public AnnounceParameters Parameters;
 
-           public ConnectAnnounceState(AnnounceParameters parameters, AsyncCallback callback, object state)
-               : base (callback, state)
-           {
-               Parameters = parameters;
-           }
-       }
+            public ConnectAnnounceState(AnnounceParameters parameters, AsyncCallback callback, object state)
+                : base(callback, state)
+            {
+                Parameters = parameters;
+            }
+        }
 
-       class ConnectScrapeState : UdpTrackerAsyncState
-       {
-           public ScrapeParameters Parameters;
+        class ConnectScrapeState : UdpTrackerAsyncState
+        {
+            public ScrapeParameters Parameters;
 
-           public ConnectScrapeState(ScrapeParameters parameters, AsyncCallback callback, object state)
-               : base (callback, state)
-           {
-               Parameters = parameters;
-           }
-       }
+            public ConnectScrapeState(ScrapeParameters parameters, AsyncCallback callback, object state)
+                : base(callback, state)
+            {
+                Parameters = parameters;
+            }
+        }
 
-       #endregion
-   }
+        #endregion
+    }
 }
