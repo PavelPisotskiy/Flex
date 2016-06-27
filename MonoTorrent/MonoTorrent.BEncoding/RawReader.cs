@@ -46,7 +46,7 @@ namespace MonoTorrent.BEncoding
         }
 
         public RawReader(Stream input)
-            : this(input, true)
+            : this(input, false)
         {
 
         }
