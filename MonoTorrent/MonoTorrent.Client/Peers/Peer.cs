@@ -121,7 +121,7 @@ namespace MonoTorrent.Client
         #region Constructors
 
         public Peer(string peerId, Uri connectionUri)
-            : this (peerId, connectionUri, EncryptionTypes.All)
+            : this(peerId, connectionUri, EncryptionTypes.All)
         {
 
         }
@@ -185,7 +185,7 @@ namespace MonoTorrent.Client
         {
             if (succeeded && repeatedHashFails > 0)
                 repeatedHashFails--;
-            
+
             if (!succeeded)
             {
                 repeatedHashFails++;
@@ -255,6 +255,10 @@ namespace MonoTorrent.Client
 
                 port = (UInt16)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(byteOrderedData, i));
                 i += 2;
+
+                if (port == 0)
+                    continue;
+
                 sb.Append(':');
                 sb.Append(port);
 

@@ -51,7 +51,7 @@ namespace MonoTorrent.Client
         private UdpClient udpClient;
 
         public LocalPeerListener(ClientEngine engine)
-            : base(new IPEndPoint(IPAddress.Any, 6771))
+            : base(new IPEndPoint(IPAddress.Any, MulticastPort))
         {
             this.engine = engine;
         }

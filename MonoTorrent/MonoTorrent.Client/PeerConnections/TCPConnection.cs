@@ -82,7 +82,7 @@ namespace MonoTorrent.Client.Connections
 
         public IPV4Connection(Uri uri)
             : this(new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp), 
-                   new IPEndPoint(IPAddress.Parse(uri.Host), uri.Port),
+                   new IPEndPoint(IPAddress.Parse(uri.Host), uri.Port == -1 ? 80 : uri.Port),
                    false)
         {
             this.uri = uri;

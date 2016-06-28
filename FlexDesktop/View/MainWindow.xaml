@@ -28,19 +28,31 @@
         </Grid.RowDefinitions>
 
         <Border Background="#FF004F7D" Padding="0,0,0,3">
-            <Border Background="#FF0272B2">
-                <TextBlock Margin="25,10" FontSize="30" Foreground="White">Flex</TextBlock>
-            </Border>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Background="#FF0272B2">
+                    <TextBlock Margin="25,10" FontSize="30" Foreground="White">Flex</TextBlock>
+                </Border>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal">
+                    
+                </StackPanel>
+            </Grid>
+            
         </Border>
 
-        <ListBox Grid.Row="1" 
+        <ListView Grid.Row="1" 
                  Margin="5" 
                  ItemsSource="{Binding Torrents}" 
                  Name="lst" 
                  ScrollViewer.CanContentScroll="False" 
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 HorizontalContentAlignment="Stretch">
-            <ListBox.ItemTemplate>
+                 HorizontalContentAlignment="Stretch" BorderBrush="{x:Null}" BorderThickness="0">
+            <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="5">
                         <Grid.RowDefinitions>
@@ -48,27 +60,89 @@
                             <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
+
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="0.9*"></ColumnDefinition>
-                            <ColumnDefinition Width="0.1*"></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding Torrent.Name, Mode=OneWay}" Margin="0,5"></TextBlock>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Torrent.Name, Mode=OneWay}" Margin="0,5"></TextBlock>
 
-                        <ProgressBar Grid.Row="1" Grid.Column="0" Value="{Binding Progress, Mode=OneWay}" Foreground="#FF0272B2"></ProgressBar>
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Progress, Mode=OneWay, StringFormat={}{0:0.##}%}" Margin="10,0,0,0"></TextBlock>
+                        <ProgressBar Grid.Row="1" Grid.Column="0" Value="{Binding Progress, Mode=OneWay}" Foreground="#FF0272B2" Height="15"></ProgressBar>
+
+                        <StackPanel Grid.Row="2" Grid.Column="0" Margin="5,5,5,0" Orientation="Horizontal">
+                            
+                            <StackPanel Orientation="Horizontal" Margin="0,5,10,0">
+                                <Viewbox Width="24" Height="24">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" Fill="#FF6f6f6f" />
+                                    </Canvas>
+                                </Viewbox>
+
+                                <TextBlock Text="{Binding Monitor.DownloadSpeed, Converter={StaticResource speedConverter}}" VerticalAlignment="Center"></TextBlock>
+                            </StackPanel>
+
+                            <StackPanel  Orientation="Horizontal"  Margin="10,5,10,0">
+                                <Viewbox Width="24" Height="24">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z" Fill="#FF6f6f6f" />
+                                    </Canvas>
+                                </Viewbox>
+
+                                <TextBlock Text="{Binding Monitor.UploadSpeed, Converter={StaticResource speedConverter}}" VerticalAlignment="Center"></TextBlock>
+                            </StackPanel>
+
+                        </StackPanel>
+
+                        <StackPanel Grid.RowSpan="3" 
+                                    Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    Margin="10,0">
+
+                            <Button VerticalAlignment="Center" 
+                                CommandParameter="{Binding Mode=OneWay}" 
+                                Command="{Binding Main.StartTorrentCommand, Mode=OneWay, Source={StaticResource Locator}}" 
+                                Style="{Binding Mode=OneWay, Source={StaticResource CircleButton}}" 
+                                Padding="5"
+                                Margin="5">
+                                <Viewbox Width="18" Height="18">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="M8,5.14V19.14L19,12.14L8,5.14Z" Fill="White" />
+                                    </Canvas>
+                                </Viewbox>
+                            </Button>
+
+                            <Button VerticalAlignment="Center" 
+                                CommandParameter="{Binding Mode=OneWay}" 
+                                Command="{Binding Main.PauseTorrentCommand, Mode=OneWay, Source={StaticResource Locator}}" 
+                                Style="{Binding Mode=OneWay, Source={StaticResource CircleButton}}" 
+                                Padding="5"
+                                Margin="5">
+                                <Viewbox Width="18" Height="18">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="M14,19H18V5H14M6,19H10V5H6V19Z" Fill="White" />
+                                    </Canvas>
+                                </Viewbox>
+                            </Button>
+
+                            <Button VerticalAlignment="Center" 
+                                CommandParameter="{Binding Mode=OneWay}" 
+                                Command="{Binding Main.OpenFolderTorrentCommand, Mode=OneWay, Source={StaticResource Locator}}" 
+                                Style="{Binding Mode=OneWay, Source={StaticResource CircleButton}}" 
+                                Padding="5"
+                                Margin="5">
+                                <Viewbox Width="18" Height="18">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z" Fill="White" />
+                                    </Canvas>
+                                </Viewbox>
+                            </Button>
+                        </StackPanel>
+
                         
-                        <Grid Grid.Row="2" Margin="5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding Monitor.DownloadSpeed, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource speedConverter}}"></TextBlock>
-                            <TextBlock Grid.Column="1" Text="{Binding State, Mode=OneWay}"></TextBlock>
-                        </Grid>
                     </Grid>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+            </ListView.ItemTemplate>
+        </ListView>
     </Grid>
 </Window>
