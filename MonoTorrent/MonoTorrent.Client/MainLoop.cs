@@ -240,7 +240,7 @@ namespace MonoTorrent.Client
             if (Thread.CurrentThread == thread)
                 t.Execute();
             else
-                Queue(t, Priority.Highest);
+                Queue(t, Priority.Normal);
 
             t.WaitHandle.WaitOne();
 

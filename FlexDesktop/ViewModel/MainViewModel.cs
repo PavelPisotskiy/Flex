@@ -32,49 +32,6 @@ namespace FlexDesktop.ViewModel
             engine = new ClientEngine(eSettings);
 
             Torrents = new ObservableCollection<TorrentManager>();
-
-            engine.Listener.Start();
-
-            //IPEndPoint listenAddress = new IPEndPoint(IPAddress.Any, 34852);
-
-            //// Create a listener which will process incoming/outgoing dht messages
-            //DhtListener listener = new DhtListener(listenAddress);
-
-            //// Create the dht engine
-            //DhtEngine dht = new DhtEngine(listener);
-
-            //// Connect the Dht engine to the MonoTorrent engine
-            //engine.RegisterDht(dht);
-
-            //// Start listening for dht messages and activate the DHT engine
-            //listener.Start();
-
-            //dht.Start();
-
-            dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-            dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
-
-            dispatcherTimer.Start();
-
-        }
-
-        private void dispatcherTimer_Tick(object sender, EventArgs e)
-        {
-            //foreach (var item in engine.Torrents)
-            //{
-            //    Console.WriteLine(item.Peers.Leechs);
-            //    Console.WriteLine(item.Peers.Seeds);
-            //    Console.WriteLine(item.Peers.Available);
-
-            //    foreach (var peer in item.GetPeers())
-            //    {
-            //        Console.WriteLine("\t" + peer.Uri);
-            //        Console.WriteLine("\t" + peer.Monitor.DownloadSpeed);
-            //        Console.WriteLine("\t" + peer.IsConnected);
-            //    }
-            //    Console.WriteLine(new string('-', 30));
-            //}
         }
 
         public void AddTorrent(string pathToTorrentFile)
@@ -86,7 +43,7 @@ namespace FlexDesktop.ViewModel
                     ViewModelLocator locator = new ViewModelLocator();
                     var addTorrentViewModel = locator.AddTorrent;
 
-                    TorrentSettings tSettings = new TorrentSettings(5, 100);
+                    TorrentSettings tSettings = new TorrentSettings(50, 500);
                     tSettings.UseDht = true;
 
                     TorrentManager manager = new TorrentManager(addTorrentViewModel.Torrent, addTorrentViewModel.PathToFolder, tSettings);
@@ -95,8 +52,6 @@ namespace FlexDesktop.ViewModel
                         engine.Register(manager);
 
                         manager.Start();
-
-
 
                         Torrents.Add(manager);
                     }
