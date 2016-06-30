@@ -32,7 +32,7 @@
                 <Border Background="#FF0272B2">
                     <StackPanel Orientation="Horizontal">
                         <Button HorizontalAlignment="Left" Padding="10" Style="{Binding Mode=OneWay, Source={StaticResource ControlButton}}" Command="{Binding StartTorrentCommand, Mode=OneWay}">
-                            <Viewbox Width="36" Height="36">
+                            <Viewbox Width="24" Height="24">
                                 <Canvas Width="24" Height="24">
                                     <Path Data="M8,5.14V19.14L19,12.14L8,5.14Z" Fill="White" />
                                 </Canvas>
@@ -40,7 +40,7 @@
                         </Button>
 
                         <Button HorizontalAlignment="Left" Padding="10" Style="{Binding Mode=OneWay, Source={StaticResource ControlButton}}" Command="{Binding PauseTorrentCommand, Mode=OneWay}">
-                            <Viewbox Width="36" Height="36">
+                            <Viewbox Width="24" Height="24">
                                 <Canvas Width="24" Height="24">
                                     <Path Data="M14,19H18V5H14M6,19H10V5H6V19Z" Fill="White" />
                                 </Canvas>
@@ -48,7 +48,7 @@
                         </Button>
 
                         <Button HorizontalAlignment="Left" Padding="10" Style="{Binding Mode=OneWay, Source={StaticResource ControlButton}}" Command="{Binding RemoveTorrentCommand, Mode=OneWay}">
-                            <Viewbox Width="36" Height="36">
+                            <Viewbox Width="24" Height="24">
                                 <Canvas Width="24" Height="24">
                                     <Path Data="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" Fill="White" />
                                 </Canvas>
