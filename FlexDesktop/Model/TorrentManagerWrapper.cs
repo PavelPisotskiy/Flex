@@ -32,6 +32,8 @@ namespace FlexDesktop.Model
             UploadSpeed = manager.Monitor.UploadSpeed;
         }
 
+        public TorrentManager Manager { get { return manager; } }
+
         public string Name { get { return manager.Torrent.Name; } }
 
         public double Progress

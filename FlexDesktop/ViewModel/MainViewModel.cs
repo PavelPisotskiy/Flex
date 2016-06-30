@@ -143,6 +143,34 @@ namespace FlexDesktop.ViewModel
         }
         #endregion
 
+        #region RemoveTorrentCommand
+        private RelayCommand removeTorrentCommand;
+
+        public ICommand RemoveTorrentCommand
+        {
+            get
+            {
+                if (removeTorrentCommand == null)
+                    removeTorrentCommand = new RelayCommand(RemoveTorrentCommandExecute, RemoveTorrentCommandCanExecute);
+
+                return removeTorrentCommand;
+            }
+        }
+
+        private void RemoveTorrentCommandExecute()
+        {
+            SelectedItem.Stop();
+            engine.Unregister(SelectedItem.Manager);
+            SelectedItem.Manager.Dispose();
+            Torrents.Remove(SelectedItem);
+        }
+
+        private bool RemoveTorrentCommandCanExecute()
+        {
+            return SelectedItem != null;
+        }
+        #endregion
+
         private TorrentManagerWrapper selectedItem;
 
         public TorrentManagerWrapper SelectedItem
