@@ -16,13 +16,42 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Visibility" Value="Collapsed"></Setter>
+                            <Setter Property="Opacity" Value="0.7"></Setter>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="border" Property="Stroke" Value="#FF004F7D"></Setter>
                         </Trigger>
                         <Trigger  Property="IsPressed" Value="True">
                             <Setter TargetName="border" Property="Fill" Value="#FF004F7D"></Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ControlButton" TargetType="{x:Type Button}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+
+                    <Grid>
+                        <Border Name="border" Background="#FF0272B2">
+                            <ContentPresenter Margin="{Binding Padding, RelativeSource={RelativeSource TemplatedParent}}" HorizontalAlignment="Center" VerticalAlignment="Center" ></ContentPresenter>
+                        </Border>
+
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5"></Setter>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#FF0068A3"></Setter>
+                        </Trigger>
+                        <Trigger  Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#FF004F7D"></Setter>
                         </Trigger>
                     </ControlTemplate.Triggers>
 

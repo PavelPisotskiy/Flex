@@ -1,6 +1,6 @@
 ﻿using FlexDesktop.Messages;
 using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
 using MonoTorrent;
 using MonoTorrent.BEncoding;
@@ -23,7 +23,6 @@ namespace FlexDesktop.ViewModel
     public class MainViewModel : ViewModelBase
     {
         ClientEngine engine;
-        private DispatcherTimer dispatcherTimer;
 
         public MainViewModel()
         {
@@ -67,52 +66,52 @@ namespace FlexDesktop.ViewModel
         }
 
         #region PauseTorrentCommand
-        private RelayCommand<TorrentManager> pauseTorrentCommand;
+        private RelayCommand pauseTorrentCommand;
 
         public ICommand PauseTorrentCommand
         {
             get
             {
                 if (pauseTorrentCommand == null)
-                    pauseTorrentCommand = new RelayCommand<TorrentManager>(PauseTorrentCommandExecute, PauseTorrentCommandCanExecute);
+                    pauseTorrentCommand = new RelayCommand(PauseTorrentCommandExecute, PauseTorrentCommandCanExecute);
 
                 return pauseTorrentCommand;
             }
         }
 
-        private void PauseTorrentCommandExecute(TorrentManager obj)
+        private void PauseTorrentCommandExecute()
         {
-            obj.Stop();
+            SelectedItem.Stop();
         }
 
-        private bool PauseTorrentCommandCanExecute(TorrentManager arg)
+        private bool PauseTorrentCommandCanExecute()
         {
-            return arg.State == TorrentState.Downloading;
+            return SelectedItem != null && SelectedItem.State == TorrentState.Downloading;
         }
         #endregion
 
         #region StartTorrentCommand
-        private RelayCommand<TorrentManager> startTorrentCommand;
+        private RelayCommand startTorrentCommand;
 
         public ICommand StartTorrentCommand
         {
             get
             {
                 if (startTorrentCommand == null)
-                    startTorrentCommand = new RelayCommand<TorrentManager>(StartTorrentCommandExecute, StartTorrentCommandCanExecute);
+                    startTorrentCommand = new RelayCommand(StartTorrentCommandExecute, StartTorrentCommandCanExecute);
 
                 return startTorrentCommand;
             }
         }
 
-        private void StartTorrentCommandExecute(TorrentManager obj)
+        private void StartTorrentCommandExecute()
         {
-            obj.Start();
+            SelectedItem.Start();
         }
 
-        private bool StartTorrentCommandCanExecute(TorrentManager arg)
+        private bool StartTorrentCommandCanExecute()
         {
-            return arg.State == TorrentState.Paused || arg.State == TorrentState.Stopped || arg.State == TorrentState.Stopping;
+            return SelectedItem != null && (SelectedItem.State == TorrentState.Paused || SelectedItem.State == TorrentState.Stopped || SelectedItem.State == TorrentState.Stopping );
         }
         #endregion
 
@@ -124,10 +123,15 @@ namespace FlexDesktop.ViewModel
             get
             {
                 if (openFolderTorrentCommand == null)
-                    openFolderTorrentCommand = new RelayCommand<TorrentManager>(OpenFolderTorrentCommandExecute);
+                    openFolderTorrentCommand = new RelayCommand<TorrentManager>(OpenFolderTorrentCommandExecute, OpenFolderTorrentCommandCanExecute);
 
                 return openFolderTorrentCommand;
             }
+        }
+
+        private bool OpenFolderTorrentCommandCanExecute(TorrentManager arg)
+        {
+            return Directory.Exists(arg.SavePath);
         }
 
         private void OpenFolderTorrentCommandExecute(TorrentManager obj)
@@ -135,6 +139,19 @@ namespace FlexDesktop.ViewModel
             Process.Start(obj.SavePath);
         }
         #endregion
+
+        private TorrentManager selectedItem;
+
+        public TorrentManager SelectedItem
+        {
+            get { return selectedItem; }
+            set
+            {
+                selectedItem = value;
+                RaisePropertyChanged(() => SelectedItem);
+            }
+        }
+
 
     }
 }

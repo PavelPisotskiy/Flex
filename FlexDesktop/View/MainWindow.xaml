@@ -29,25 +29,33 @@
 
         <Border Background="#FF004F7D" Padding="0,0,0,3">
             <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                </Grid.RowDefinitions>
+                <Border Background="#FF0272B2">
+                    <StackPanel Orientation="Horizontal">
+                        <Button HorizontalAlignment="Left" Padding="10" Style="{Binding Mode=OneWay, Source={StaticResource ControlButton}}" Command="{Binding StartTorrentCommand, Mode=OneWay}">
+                            <Viewbox Width="36" Height="36">
+                                <Canvas Width="24" Height="24">
+                                    <Path Data="M8,5.14V19.14L19,12.14L8,5.14Z" Fill="White" />
+                                </Canvas>
+                            </Viewbox>
+                        </Button>
 
-                <Border Grid.Row="0" Background="#FF0272B2">
-                    <TextBlock Margin="25,10" FontSize="30" Foreground="White">Flex</TextBlock>
+                        <Button HorizontalAlignment="Left" Padding="10" Style="{Binding Mode=OneWay, Source={StaticResource ControlButton}}" Command="{Binding PauseTorrentCommand, Mode=OneWay}">
+                            <Viewbox Width="36" Height="36">
+                                <Canvas Width="24" Height="24">
+                                    <Path Data="M14,19H18V5H14M6,19H10V5H6V19Z" Fill="White" />
+                                </Canvas>
+                            </Viewbox>
+                        </Button>
+                    </StackPanel>
                 </Border>
-
-                <StackPanel Grid.Row="1" Orientation="Horizontal">
-                    
-                </StackPanel>
             </Grid>
-            
+
         </Border>
 
         <ListView Grid.Row="1" 
                  Margin="5" 
                  ItemsSource="{Binding Torrents}" 
+                 SelectedItem="{Binding SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  Name="lst" 
                  ScrollViewer.CanContentScroll="False" 
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -71,7 +79,7 @@
                         <ProgressBar Grid.Row="1" Grid.Column="0" Value="{Binding Progress, Mode=OneWay}" Foreground="#FF0272B2" Height="15"></ProgressBar>
 
                         <StackPanel Grid.Row="2" Grid.Column="0" Margin="5,5,5,0" Orientation="Horizontal">
-                            
+
                             <StackPanel Orientation="Horizontal" Margin="0,5,10,0">
                                 <Viewbox Width="24" Height="24">
                                     <Canvas Width="24" Height="24">
@@ -94,52 +102,23 @@
 
                         </StackPanel>
 
-                        <StackPanel Grid.RowSpan="3" 
-                                    Grid.Column="1"
-                                    Orientation="Horizontal"
-                                    Margin="10,0">
 
-                            <Button VerticalAlignment="Center" 
-                                CommandParameter="{Binding Mode=OneWay}" 
-                                Command="{Binding Main.StartTorrentCommand, Mode=OneWay, Source={StaticResource Locator}}" 
-                                Style="{Binding Mode=OneWay, Source={StaticResource CircleButton}}" 
-                                Padding="5"
-                                Margin="5">
-                                <Viewbox Width="18" Height="18">
-                                    <Canvas Width="24" Height="24">
-                                        <Path Data="M8,5.14V19.14L19,12.14L8,5.14Z" Fill="White" />
-                                    </Canvas>
-                                </Viewbox>
-                            </Button>
-
-                            <Button VerticalAlignment="Center" 
-                                CommandParameter="{Binding Mode=OneWay}" 
-                                Command="{Binding Main.PauseTorrentCommand, Mode=OneWay, Source={StaticResource Locator}}" 
-                                Style="{Binding Mode=OneWay, Source={StaticResource CircleButton}}" 
-                                Padding="5"
-                                Margin="5">
-                                <Viewbox Width="18" Height="18">
-                                    <Canvas Width="24" Height="24">
-                                        <Path Data="M14,19H18V5H14M6,19H10V5H6V19Z" Fill="White" />
-                                    </Canvas>
-                                </Viewbox>
-                            </Button>
-
-                            <Button VerticalAlignment="Center" 
+                        <Button VerticalAlignment="Center" 
+                                Grid.RowSpan="3" 
+                                Grid.Column="1" 
                                 CommandParameter="{Binding Mode=OneWay}" 
                                 Command="{Binding Main.OpenFolderTorrentCommand, Mode=OneWay, Source={StaticResource Locator}}" 
                                 Style="{Binding Mode=OneWay, Source={StaticResource CircleButton}}" 
                                 Padding="5"
-                                Margin="5">
-                                <Viewbox Width="18" Height="18">
-                                    <Canvas Width="24" Height="24">
-                                        <Path Data="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z" Fill="White" />
-                                    </Canvas>
-                                </Viewbox>
-                            </Button>
-                        </StackPanel>
+                                Margin="10,0,0,0">
+                            <Viewbox Width="18" Height="18">
+                                <Canvas Width="24" Height="24">
+                                    <Path Data="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z" Fill="White" />
+                                </Canvas>
+                            </Viewbox>
+                        </Button>
 
-                        
+
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
