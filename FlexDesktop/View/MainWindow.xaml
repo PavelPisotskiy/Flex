@@ -21,7 +21,7 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid>
+    <Grid Background="#FFEEEEEE">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
@@ -54,15 +54,16 @@
 
         <ListView Grid.Row="1" 
                  Margin="5" 
+                 Focusable="False"
                  ItemsSource="{Binding Torrents}" 
                  SelectedItem="{Binding SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  Name="lst" 
                  ScrollViewer.CanContentScroll="False" 
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 HorizontalContentAlignment="Stretch" BorderBrush="{x:Null}" BorderThickness="0">
+                 HorizontalContentAlignment="Stretch" BorderBrush="{x:Null}" BorderThickness="0" Style="{Binding Mode=OneWay, Source={StaticResource CustomListView}}">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="5">
+                    <Grid Margin="15">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
