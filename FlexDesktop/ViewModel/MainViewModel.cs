@@ -1,4 +1,5 @@
 ﻿using FlexDesktop.Messages;
+using FlexDesktop.Model;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
@@ -30,7 +31,7 @@ namespace FlexDesktop.ViewModel
 
             engine = new ClientEngine(eSettings);
 
-            Torrents = new ObservableCollection<TorrentManager>();
+            Torrents = new ObservableCollection<TorrentManagerWrapper>();
         }
 
         public void AddTorrent(string pathToTorrentFile)
@@ -52,14 +53,16 @@ namespace FlexDesktop.ViewModel
 
                         manager.Start();
 
-                        Torrents.Add(manager);
+                        TorrentManagerWrapper wrapper = new TorrentManagerWrapper(manager);
+
+                        Torrents.Add(wrapper);
                     }
                 }
             }, pathToTorrentFile));
         }
 
 
-        public ObservableCollection<TorrentManager> Torrents
+        public ObservableCollection<TorrentManagerWrapper> Torrents
         {
             get;
             private set;
@@ -116,33 +119,33 @@ namespace FlexDesktop.ViewModel
         #endregion
 
         #region OpenFolderTorrentCommand
-        private RelayCommand<TorrentManager> openFolderTorrentCommand;
+        private RelayCommand<TorrentManagerWrapper> openFolderTorrentCommand;
 
         public ICommand OpenFolderTorrentCommand
         {
             get
             {
                 if (openFolderTorrentCommand == null)
-                    openFolderTorrentCommand = new RelayCommand<TorrentManager>(OpenFolderTorrentCommandExecute, OpenFolderTorrentCommandCanExecute);
+                    openFolderTorrentCommand = new RelayCommand<TorrentManagerWrapper>(OpenFolderTorrentCommandExecute, OpenFolderTorrentCommandCanExecute);
 
                 return openFolderTorrentCommand;
             }
         }
 
-        private bool OpenFolderTorrentCommandCanExecute(TorrentManager arg)
+        private bool OpenFolderTorrentCommandCanExecute(TorrentManagerWrapper torrent)
         {
-            return Directory.Exists(arg.SavePath);
+            return Directory.Exists(torrent.SavePath);
         }
 
-        private void OpenFolderTorrentCommandExecute(TorrentManager obj)
+        private void OpenFolderTorrentCommandExecute(TorrentManagerWrapper torrent)
         {
-            Process.Start(obj.SavePath);
+            Process.Start(torrent.SavePath);
         }
         #endregion
 
-        private TorrentManager selectedItem;
+        private TorrentManagerWrapper selectedItem;
 
-        public TorrentManager SelectedItem
+        public TorrentManagerWrapper SelectedItem
         {
             get { return selectedItem; }
             set

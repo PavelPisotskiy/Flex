@@ -75,7 +75,7 @@
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Torrent.Name, Mode=OneWay}" Margin="0,5"></TextBlock>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Name, Mode=OneWay}" Margin="0,5"></TextBlock>
 
                         <ProgressBar Grid.Row="1" Grid.Column="0" Value="{Binding Progress, Mode=OneWay}" Foreground="#FF0272B2" Height="15"></ProgressBar>
 
@@ -88,7 +88,7 @@
                                     </Canvas>
                                 </Viewbox>
 
-                                <TextBlock Text="{Binding Monitor.DownloadSpeed, Converter={StaticResource speedConverter}}" VerticalAlignment="Center"></TextBlock>
+                                <TextBlock Text="{Binding DownloadSpeed, Converter={StaticResource speedConverter}, Mode=OneWay}" VerticalAlignment="Center"></TextBlock>
                             </StackPanel>
 
                             <StackPanel  Orientation="Horizontal"  Margin="10,5,10,0">
@@ -98,7 +98,7 @@
                                     </Canvas>
                                 </Viewbox>
 
-                                <TextBlock Text="{Binding Monitor.UploadSpeed, Converter={StaticResource speedConverter}}" VerticalAlignment="Center"></TextBlock>
+                                <TextBlock Text="{Binding UploadSpeed, Converter={StaticResource speedConverter}, Mode=OneWay}" VerticalAlignment="Center"></TextBlock>
                             </StackPanel>
 
                         </StackPanel>

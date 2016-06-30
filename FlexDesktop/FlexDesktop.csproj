@@ -90,6 +90,7 @@
     <Compile Include="Helpers\SingleInstanceApplicationWrapper.cs" />
     <Compile Include="Messages\AddTorrentShowDialog.cs" />
     <Compile Include="Messages\FolderBrowserShowDialogMessage.cs" />
+    <Compile Include="Model\TorrentManagerWrapper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ViewModel\AddTorrentWindowViewModel.cs" />
     <Compile Include="View\AddTorrentWindow.xaml.cs">
