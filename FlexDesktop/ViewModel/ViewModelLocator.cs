@@ -21,17 +21,9 @@ namespace FlexDesktop.ViewModel
         {
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
 
-            if (ViewModelBase.IsInDesignModeStatic)
-            {
-                //SimpleIoc.Default.Register<IDataService, Design.DesignDataService>();
-            }
-            else
-            {
-                //SimpleIoc.Default.Register<IDataService, DataService>();
-            }
-
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<AddTorrentWindowViewModel>();
+            SimpleIoc.Default.Register<DeleteTorrentWindowViewModel>();
         }
         
         public MainViewModel Main
@@ -47,6 +39,14 @@ namespace FlexDesktop.ViewModel
             get
             {
                 return ServiceLocator.Current.GetInstance<AddTorrentWindowViewModel>();
+            }
+        }
+
+        public DeleteTorrentWindowViewModel DeleteTorrent
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<DeleteTorrentWindowViewModel>();
             }
         }
 

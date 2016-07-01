@@ -19,7 +19,15 @@ namespace FlexDesktop.View
             
 
             Messenger.Default.Register<AddTorrentShowDialog>(this, OpenAddTorrentWindow);
-            
+            Messenger.Default.Register<DeleteTorrentShowDialog>(this, OpenDeleteTorrentWindow);
+
+        }
+
+        private void OpenDeleteTorrentWindow(DeleteTorrentShowDialog obj)
+        {
+            DeleteTorrentWindow window = new DeleteTorrentWindow();
+            window.Owner = this;
+            obj.CallBack(window.ShowDialog());
         }
 
         private void OpenAddTorrentWindow(AddTorrentShowDialog obj)

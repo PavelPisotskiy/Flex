@@ -86,19 +86,27 @@
     </ApplicationDefinition>
     <Compile Include="Converters\BiteConverter.cs" />
     <Compile Include="Converters\DownloadConverter.cs" />
+    <Compile Include="Converters\EnumToBoolConverter.cs" />
     <Compile Include="Converters\SpeedConverter.cs" />
     <Compile Include="Helpers\SingleInstanceApplicationWrapper.cs" />
     <Compile Include="Messages\AddTorrentShowDialog.cs" />
+    <Compile Include="Messages\DeleteTorrentShowDialog.cs" />
     <Compile Include="Messages\FolderBrowserShowDialogMessage.cs" />
+    <Compile Include="Model\DeleteTorrent.cs" />
     <Compile Include="Model\TorrentManagerWrapper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ViewModel\AddTorrentWindowViewModel.cs" />
+    <Compile Include="ViewModel\DeleteTorrentWindowViewModel.cs" />
     <Compile Include="View\AddTorrentWindow.xaml.cs">
       <DependentUpon>AddTorrentWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Page Include="View\AddTorrentWindow.xaml">
+      <SubType>Form</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\DeleteTorrentWindow.xaml">
       <SubType>Form</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -109,6 +117,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="View\DeleteTorrentWindow.xaml.cs">
+      <DependentUpon>DeleteTorrentWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

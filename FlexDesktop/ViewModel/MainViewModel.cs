@@ -114,7 +114,7 @@ namespace FlexDesktop.ViewModel
 
         private bool StartTorrentCommandCanExecute()
         {
-            return SelectedItem != null && (SelectedItem.State == TorrentState.Paused || SelectedItem.State == TorrentState.Stopped || SelectedItem.State == TorrentState.Stopping );
+            return SelectedItem != null && (SelectedItem.State == TorrentState.Paused || SelectedItem.State == TorrentState.Stopped || SelectedItem.State == TorrentState.Stopping);
         }
         #endregion
 
@@ -159,10 +159,39 @@ namespace FlexDesktop.ViewModel
 
         private void RemoveTorrentCommandExecute()
         {
-            SelectedItem.Stop();
-            engine.Unregister(SelectedItem.Manager);
-            SelectedItem.Manager.Dispose();
-            Torrents.Remove(SelectedItem);
+            Messenger.Default.Send(new DeleteTorrentShowDialog((dialogResult) =>
+            {
+                if (dialogResult == true)
+                {
+                    SelectedItem.Stop();
+                    engine.Unregister(SelectedItem.Manager);
+
+                    ViewModelLocator locator = new ViewModelLocator();
+                    var deleteTorrentVM = locator.DeleteTorrent;
+                    if(deleteTorrentVM.Delete == DeleteTorrent.DeleteWithDownloadedFiles)
+                    {
+                        foreach (var item in SelectedItem.Files)
+                        {
+                            File.Delete(SelectedItem.SavePath + "\\" + item.Path);
+                        }
+
+                        try
+                        {
+                            Directory.Delete(SelectedItem.SavePath, false);
+                        }
+                        catch (IOException)
+                        {
+                            
+                        }
+                        
+                    }
+
+                    
+                    SelectedItem.Manager.Dispose();
+                    Torrents.Remove(SelectedItem);
+                }
+            }));
+            
         }
 
         private bool RemoveTorrentCommandCanExecute()

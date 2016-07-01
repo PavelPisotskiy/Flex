@@ -67,6 +67,8 @@ namespace FlexDesktop.Model
         public string SavePath { get { return manager.SavePath; } }
 
         public TorrentState State { get { return manager.State; } }
+
+        public TorrentFile[] Files { get { return manager.Torrent.Files; } }
         
         public void Start()
         {
