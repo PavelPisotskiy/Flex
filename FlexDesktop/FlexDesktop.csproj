@@ -93,6 +93,8 @@
     <Compile Include="Messages\DeleteTorrentShowDialog.cs" />
     <Compile Include="Messages\FolderBrowserShowDialogMessage.cs" />
     <Compile Include="Model\DeleteTorrent.cs" />
+    <Compile Include="Model\ResumeTorrentInfo.cs" />
+    <Compile Include="Model\SaveLoadTorrentManager.cs" />
     <Compile Include="Model\TorrentManagerWrapper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ViewModel\AddTorrentWindowViewModel.cs" />

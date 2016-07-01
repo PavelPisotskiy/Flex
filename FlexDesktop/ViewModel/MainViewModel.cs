@@ -11,6 +11,7 @@ using MonoTorrent.Common;
 using MonoTorrent.Dht;
 using MonoTorrent.Dht.Listeners;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -23,15 +24,34 @@ namespace FlexDesktop.ViewModel
 {
     public class MainViewModel : ViewModelBase
     {
+
+        SaveLoadTorrentManager saveLoadManager = new SaveLoadTorrentManager();
+
         ClientEngine engine;
 
+        TorrentSettings tSettings = new TorrentSettings(50, 500);
+        
         public MainViewModel()
         {
+            tSettings.UseDht = true;
+
             EngineSettings eSettings = new EngineSettings();
 
             engine = new ClientEngine(eSettings);
 
             Torrents = new ObservableCollection<TorrentManagerWrapper>();
+
+            foreach (TorrentManager manager in saveLoadManager.Load(tSettings))
+            {
+                engine.Register(manager);
+
+                if(!manager.Complete)
+                    manager.Start();
+
+                TorrentManagerWrapper wrapper = new TorrentManagerWrapper(manager);
+
+                Torrents.Add(wrapper);
+            }
         }
 
         public void AddTorrent(string pathToTorrentFile)
@@ -42,13 +62,12 @@ namespace FlexDesktop.ViewModel
                 {
                     ViewModelLocator locator = new ViewModelLocator();
                     var addTorrentViewModel = locator.AddTorrent;
-
-                    TorrentSettings tSettings = new TorrentSettings(50, 500);
-                    tSettings.UseDht = true;
-
+                    
                     TorrentManager manager = new TorrentManager(addTorrentViewModel.Torrent, addTorrentViewModel.PathToFolder, tSettings);
                     if (!engine.Contains(manager.InfoHash))
                     {
+                        saveLoadManager.Add(manager);
+
                         engine.Register(manager);
 
                         manager.Start();
@@ -168,9 +187,11 @@ namespace FlexDesktop.ViewModel
                 {
                     SelectedItem.Stop();
                     engine.Unregister(SelectedItem.Manager);
+                    saveLoadManager.Remove(SelectedItem.Manager);
 
                     ViewModelLocator locator = new ViewModelLocator();
                     var deleteTorrentVM = locator.DeleteTorrent;
+                    
                     if(deleteTorrentVM.Delete == DeleteTorrent.DeleteWithDownloadedFiles)
                     {
                         foreach (var item in SelectedItem.Files)
@@ -214,6 +235,26 @@ namespace FlexDesktop.ViewModel
                 RaisePropertyChanged(() => SelectedItem);
             }
         }
+
+        #region WindowClosingCommand
+        private RelayCommand windowClosingCommand;
+
+        public ICommand WindowClosingCommand
+        {
+            get
+            {
+                if (windowClosingCommand == null)
+                    windowClosingCommand = new RelayCommand(WindowClosingCommandExecute);
+
+                return windowClosingCommand;
+            }
+        }
+
+        private void WindowClosingCommandExecute()
+        {
+            saveLoadManager.Save(engine.Torrents);   
+        }
+        #endregion
 
 
     }

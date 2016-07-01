@@ -2,6 +2,7 @@
 using MonoTorrent.Common;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ namespace FlexDesktop.Model
             DownloadSpeed = manager.Monitor.DownloadSpeed;
             UploadSpeed = manager.Monitor.UploadSpeed;
         }
-
+        
         public TorrentManager Manager { get { return manager; } }
 
         public string Name { get { return manager.Torrent.Name; } }
@@ -69,6 +70,10 @@ namespace FlexDesktop.Model
         public TorrentState State { get { return manager.State; } }
 
         public TorrentFile[] Files { get { return manager.Torrent.Files; } }
+
+        public string PathToTorrentFile { get { return manager.Torrent.TorrentPath; } }
+
+        public string FileNameWithExtension { get { return Path.GetFileName(manager.Torrent.TorrentPath); } }
         
         public void Start()
         {
