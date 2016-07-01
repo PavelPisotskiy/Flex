@@ -59,38 +59,4 @@
             </Setter.Value>
         </Setter>
     </Style>
-
-    <Style x:Key="CustomListView" TargetType="{x:Type ListView}">
-        <Setter Property="BorderBrush" Value="{x:Null}"></Setter>
-        <Setter Property="BorderThickness" Value="0"></Setter>
-        <Setter Property="Background" Value="#FFEEEEEE"></Setter>
-        <Setter Property="ItemContainerStyle">
-            <Setter.Value>
-                <Style TargetType="{x:Type ListViewItem}">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="ListViewItem">
-                                <Border Name="Border" Margin="10,5" CornerRadius="2" Background="White">
-                                    <Border.Effect>
-                                        <DropShadowEffect ShadowDepth="1" Direction="270" Color="#FFCCCCCC" />
-                                    </Border.Effect>
-                                    <ContentPresenter SnapsToDevicePixels="True" Margin="{Binding Padding, RelativeSource={RelativeSource TemplatedParent}}" />
-                                </Border>
-
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsSelected" Value="true">
-                                        <Setter TargetName="Border" Property="Effect">
-                                            <Setter.Value>
-                                                <DropShadowEffect ShadowDepth="1" Direction="270" Color="#FF999999" BlurRadius="7" />
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </Setter.Value>
-        </Setter>
-    </Style>
 </ResourceDictionary>

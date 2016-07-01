@@ -15,6 +15,7 @@
         <ResourceDictionary>
             <converters:BiteConverter x:Key="bitConverter"></converters:BiteConverter>
             <converters:SpeedConverter x:Key="speedConverter"></converters:SpeedConverter>
+
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Skins/MainSkin.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -68,9 +69,73 @@
                  Name="lst" 
                  ScrollViewer.CanContentScroll="False" 
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 HorizontalContentAlignment="Stretch" BorderBrush="{x:Null}" BorderThickness="0" Style="{Binding Mode=OneWay, Source={StaticResource CustomListView}}">
+                 HorizontalContentAlignment="Stretch" BorderBrush="{x:Null}" BorderThickness="0" Background="{x:Null}">
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="ContextMenu">
+                        <Setter.Value>
+                            <ContextMenu>
+                                <MenuItem Header="Запустить" Command="{Binding Main.StartTorrentCommand, Mode=OneWay}" DataContext="{Binding Source={StaticResource Locator}}">
+                                    <MenuItem.Icon>
+                                        <Viewbox Width="18" Height="18">
+                                            <Canvas Width="24" Height="24">
+                                                <Path Data="M8,5.14V19.14L19,12.14L8,5.14Z" Fill="#FF404040" />
+                                            </Canvas>
+                                        </Viewbox>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+
+                                <MenuItem Header="Остановить" Command="{Binding Main.PauseTorrentCommand, Mode=OneWay}" DataContext="{Binding Source={StaticResource Locator}}">
+                                    <MenuItem.Icon>
+                                        <Viewbox Width="18" Height="18">
+                                            <Canvas Width="24" Height="24">
+                                                <Path Data="M14,19H18V5H14M6,19H10V5H6V19Z" Fill="#FF404040" />
+                                            </Canvas>
+                                        </Viewbox>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+
+                                <MenuItem Header="Удалить" Command="{Binding Main.RemoveTorrentCommand, Mode=OneWay}" DataContext="{Binding Source={StaticResource Locator}}">
+                                    <MenuItem.Icon>
+                                        <Viewbox Width="18" Height="18">
+                                            <Canvas Width="24" Height="24">
+                                                <Path Data="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" Fill="#FF404040" />
+                                            </Canvas>
+                                        </Viewbox>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                            </ContextMenu>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListViewItem">
+                                <Border Name="Border" Margin="10,5" CornerRadius="2" Background="White">
+                                    <Border.Effect>
+                                        <DropShadowEffect ShadowDepth="1" Direction="270" Color="#FFCCCCCC" />
+                                    </Border.Effect>
+                                    <ContentPresenter SnapsToDevicePixels="True" Margin="{Binding Padding, RelativeSource={RelativeSource TemplatedParent}}" />
+                                </Border>
+
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="true">
+                                        <Setter TargetName="Border" Property="Effect">
+                                            <Setter.Value>
+                                                <DropShadowEffect ShadowDepth="1" Direction="270" Color="#FF999999" BlurRadius="7" />
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListView.ItemContainerStyle>
+            
             <ListView.ItemTemplate>
                 <DataTemplate>
+                    
                     <Grid Margin="15">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"></RowDefinition>

@@ -134,6 +134,9 @@ namespace FlexDesktop.ViewModel
 
         private bool OpenFolderTorrentCommandCanExecute(TorrentManagerWrapper torrent)
         {
+            if (torrent == null)
+                return false;
+
             return Directory.Exists(torrent.SavePath);
         }
 
