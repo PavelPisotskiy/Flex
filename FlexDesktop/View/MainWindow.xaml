@@ -182,6 +182,17 @@
                                 <TextBlock Text="{Binding UploadSpeed, Converter={StaticResource speedConverter}, Mode=OneWay}" VerticalAlignment="Center"></TextBlock>
                             </StackPanel>
 
+                            <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
+                                <TextBlock Text="{Binding BytesDownloaded, Converter={StaticResource bitConverter}, Mode=OneWay}" VerticalAlignment="Center"></TextBlock>
+                                <TextBlock VerticalAlignment="Center" Text=" из "></TextBlock>
+                                <TextBlock Text="{Binding TotalSize, Converter={StaticResource bitConverter}, Mode=OneWay}" VerticalAlignment="Center"></TextBlock>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
+                                <TextBlock Text="Осталось времени: " VerticalAlignment="Center"></TextBlock>
+                                <TextBlock Text="{Binding TimeLeft, Mode=OneWay}" VerticalAlignment="Center"></TextBlock>
+                            </StackPanel>
+
                         </StackPanel>
 
 

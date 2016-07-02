@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -28,11 +29,96 @@ namespace FlexDesktop.Model
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            Progress = manager.Progress;
+            //Progress = manager.Progress;
+            double progress = 0;
+            long totalSize = 0;
+            long bytesDownloaded = 0;
+
+            int timeLeft = 0;
+
+            foreach (var file in manager.Torrent.Files)
+            {
+                if(file.Priority != Priority.DoNotDownload)
+                {
+                    totalSize += file.Length;
+                    bytesDownloaded += file.BytesDownloaded;
+                }
+            }
+
+            try
+            {
+                progress = (bytesDownloaded * 100.0) / TotalSize;
+            }
+            catch (DivideByZeroException)
+            {
+                progress = 0;
+            }
+
+            try
+            {
+                timeLeft = Convert.ToInt32((totalSize - bytesDownloaded) / manager.Monitor.DownloadSpeed);
+                TimeLeft = new TimeSpan(0, 0, timeLeft);
+            }
+            catch (DivideByZeroException)
+            {
+                timeLeft = 0;
+                TimeLeft = new TimeSpan(0, 0, timeLeft);
+            }
+            catch(OverflowException)
+            {
+                TimeLeft = Timeout.InfiniteTimeSpan;
+            }
+
+            
+            
+            Progress = progress;
+            TotalSize = totalSize;
+            BytesDownloaded = bytesDownloaded;
+
+            Console.WriteLine("Progress: {0}", Progress);
+            Console.WriteLine("Total Sizes: {0}", TotalSize);
+            Console.WriteLine("Bytes Downloaded: {0}", BytesDownloaded);
+            Console.WriteLine(new string('-',50));
+
             DownloadSpeed = manager.Monitor.DownloadSpeed;
             UploadSpeed = manager.Monitor.UploadSpeed;
         }
+
+        public TimeSpan TimeLeft
+        {
+            get { return (TimeSpan)GetValue(TimeLeftProperty); }
+            set { SetValue(TimeLeftProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for TimeLeft.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty TimeLeftProperty =
+            DependencyProperty.Register("TimeLeft", typeof(TimeSpan), typeof(TorrentManagerWrapper), new PropertyMetadata(new TimeSpan()));
+
+
+
+        public long BytesDownloaded
+        {
+            get { return (long)GetValue(BytesDownloadedProperty); }
+            set { SetValue(BytesDownloadedProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for BytesDownloaded.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty BytesDownloadedProperty =
+            DependencyProperty.Register("BytesDownloaded", typeof(long), typeof(TorrentManagerWrapper));
+
+
+
+        public long TotalSize
+        {
+            get { return (long)GetValue(TotalSizeProperty); }
+            set { SetValue(TotalSizeProperty, value); }
+        }
         
+        public static readonly DependencyProperty TotalSizeProperty =
+            DependencyProperty.Register("TotalSize", typeof(long), typeof(TorrentManagerWrapper));
+
+
+
         public TorrentManager Manager { get { return manager; } }
 
         public string Name { get { return manager.Torrent.Name; } }
